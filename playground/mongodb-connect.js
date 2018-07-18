@@ -25,12 +25,14 @@ MongoClient.connect("mongodb://localhost:27017/TodoApp",(err,db)=>{
 
         console.log(`inserted successfully ${JSON.stringify(res.ops)}`);
     });
-    */
+    
    db.collection('Users').find({name:'shedo'}).count().then((count)=>{
     console.log(count);
 }).catch((err)=>{console.log("unable to find");});
-
-
+*/
+/*
+db.collection('Todos').deleteOne({completed:false}).then((result)=>{})
+*/
     db.close();
 
 });
