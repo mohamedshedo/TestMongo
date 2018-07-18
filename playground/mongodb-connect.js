@@ -33,6 +33,12 @@ MongoClient.connect("mongodb://localhost:27017/TodoApp",(err,db)=>{
 /*
 db.collection('Todos').deleteOne({completed:false}).then((result)=>{})
 */
+
+    db.collection('Todos').findOneAndUpdate({text:'Put the CD'},
+    {$set:{completed:true}},{returnOriginal:false}).
+    then((res)=>{
+        console.log(res);
+    })
     db.close();
 
 });
