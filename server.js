@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 
 
 const app = express();
-let port = process.env.PORT||3000;
+let port = 3000;
 
 
 app.use(bodyParser.json());
@@ -31,7 +31,7 @@ app.listen(port,()=>{
     console.log('server connected');
 });
 
-
+module.exports={app};
 
 /*
 let newTodo= new Todo({
