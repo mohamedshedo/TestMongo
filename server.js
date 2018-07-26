@@ -3,6 +3,7 @@ const {Todo}=require('./models/todo');
 const {UserModel}=require('./models/user');
 const express = require('express');
 const bodyParser = require('body-parser');
+const  {ObjectID} =require('mongodb');
 
 
 const app = express();
@@ -32,7 +33,31 @@ app.get('/todos',(req,res)=>{
     }).catch((err)=>{
         res.status(400).send(err);
     });
-})
+});
+
+
+
+app.get('/todos/:id',(req,res)=>{
+
+    let id = req.params.id;
+
+    if(ObjectID.isValid(id)){
+
+        
+        Todo.findById(id)
+        .then((doc)=>{
+            if(!doc){return res.status(404).send()}
+            res.send(doc);
+        })
+        .catch((err)=> {
+            res.status(404).send(err);
+        });
+    }else{
+        res.status(404).send();
+    }
+
+});
+
 
 app.listen(port,()=>{
     console.log('server connected');
