@@ -5,10 +5,14 @@ const {Todo} = require("./../models/todo");
 const {ObjectID}=require('mongodb');
 const todos = [{
     _id:new ObjectID(),
-    text:'first test todo'
+    text:'first test todo',
+    completed:false,
+    completedAt:null
 },{
     _id:new ObjectID(),
-    text:'second test todo'
+    text:'second test todo',
+    completed:true,
+    completedAt:333
 }];
 
 
@@ -105,5 +109,58 @@ describe('get /todos/id',()=>{
         .end(done);
     })
 
-})
+});
 
+
+describe('delete /todos/id:',()=>{
+
+    it("should remove the todo",(done)=>{
+
+        request(app)
+        .delete(`/todos/${todos[1]._id.toHexString()}`)
+        .expect(200)
+        .expect((res)=>{
+
+            expect(res.body.text).toBe(todos[1].text);
+        })
+        .end((err,res)=>{
+            if(err){return done(err);}
+
+            Todo.findById(todos[1]._id).then((res)=>{
+               expect(res).toBe(null);
+               done();
+            }).catch((e)=>{
+                done(e);
+            });
+        })
+    })
+});
+
+describe("patch ",()=>{
+
+
+    it("should update todo ",(done)=>{
+
+        request(app)
+        .patch(`/todos/${todos[0]._id}`)
+        .send({"completed":true})
+        .expect(200)
+        .expect((res)=>{
+            expect(res.body.completed).toBe(true)
+        }).end(done)
+    });
+
+    it('should update todo with false',(done)=>{
+
+        request(app)
+        .patch(`/todos/${todos[1]._id}`)
+        .send({"text":"new update","completed":false})
+        .expect(200)
+        .expect((doc)=>{
+            expect(doc.body.completed).toBe(false);
+            expect(doc.body.completedAt).toNotExist();
+
+        })
+        .end(done);
+    })
+})
