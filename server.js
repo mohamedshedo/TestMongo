@@ -10,7 +10,7 @@ if(env==='development'){
 }
 const {mongoose}=require('./db/mongoose');
 const {Todo}=require('./models/todo');
-const {UserModel}=require('./models/user');
+const {UserModel,User}=require('./models/user');
 const express = require('express');
 const bodyParser = require('body-parser');
 const  {ObjectID} =require('mongodb');
@@ -61,6 +61,26 @@ app.delete('/todos/:id',(req,res)=>{
         res.status(404).send(err);
     })
 })
+
+app.post('/users',(req,res)=>{
+    let reqBody= _.pick(req.body,['email','password']);
+
+    let newUser= new User({
+        email:reqBody.email,
+        password:reqBody.password
+    });
+
+    newUser.save().then((doc)=>{
+        return newUser.generateAuthToken();
+    }).then((token)=>{
+        
+        res.header('x-auth',token).send(newUser);
+    }).catch((e)=>{
+        
+        res.status(400).send(e);
+    });
+});
+
 
 app.get('/todos/:id',(req,res)=>{
 
