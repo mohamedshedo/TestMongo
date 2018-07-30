@@ -15,6 +15,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const  {ObjectID} =require('mongodb');
 const _=  require('lodash');
+const{authenticate}=require('./middleware/authenticate');
 const app = express();
 let port = process.env.PORT;
 
@@ -76,12 +77,16 @@ app.post('/users',(req,res)=>{
         
         res.header('x-auth',token).send(newUser);
     }).catch((e)=>{
-        
+       
         res.status(400).send(e);
     });
 });
 
 
+
+app.get('/users/me',authenticate,(req,res)=>{
+   res.send(req.user);
+});
 app.get('/todos/:id',(req,res)=>{
 
     let id = req.params.id;

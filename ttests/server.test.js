@@ -15,15 +15,16 @@ const todos = [{
     completedAt:333
 }];
 
+console.log(process.env.MONGODB_URL);
 
 beforeEach((done)=>{
     Todo.remove({}).then(()=>{
         return Todo.insertMany(todos);
     }).then((docs)=>{
         done();
-
     });
 })
+
 describe('post /todo',()=>{
 
     it('should create new todo',(done)=>{

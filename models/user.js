@@ -2,6 +2,7 @@ const mongoose=require('mongoose');
 const validator = require('validator');
 const jwt =require('jsonwebtoken');
 const _= require('lodash');
+const bcrypt =require('bcryptjs');
 let UserSchemz= mongoose.Schema({
     username:{
         type:String,
@@ -53,7 +54,25 @@ NewUserSchema.methods.toJSON=function(){
     return _.pick(userObject,["_id","email"]);
 }
 
+NewUserSchema.statics.findByToken=function(token){
+    let User=this;
+    let decoded;
+    try{
+        decoded= jwt.verify(token,'abc123');
+    }catch(e){
+        return new Promise((resolve,reject)=>{
+            reject();
+        });
 
+        //return promise.reject
+    }
+
+    return User.findOne({
+        '_id':decoded._id,
+        'tokens.token':token,
+        'tokens.access':'auth'
+    });
+}
 NewUserSchema.methods.generateAuthToken = function(){
     let user=this;
     let access='auth';
@@ -63,6 +82,27 @@ NewUserSchema.methods.generateAuthToken = function(){
         return token;
     });
 };
+
+
+NewUserSchema.pre('save',function(next){
+
+    let user = this;
+
+    if(user.isModified('password')){
+        
+        bcrypt.genSalt(10,(err,salt)=>{
+            
+            bcrypt.hash(user.password,salt,(err,hash)=>{
+            
+                user.password=hash;
+                next();
+            });
+        });
+
+    }else{
+    next();
+}
+});
 
 let UserModel = mongoose.model("Users",UserSchemz);
 
