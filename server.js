@@ -1,13 +1,5 @@
 
-let env=process.env.NODE_ENV || 'development';
-console.log(env);
-if(env==='development'){
-    process.env.PORT=2000;
-    process.env.MONGODB_URL="mongodb://localhost:27017/TodoApp";
-}else if (env ==='test'){
-    process.env.PORT=3000;
-    process.env.MONGODB_URL="mongodb://localhost:27017/TodoAppTest";
-}
+require('./config/config.js');
 const {mongoose}=require('./db/mongoose');
 const {Todo}=require('./models/todo');
 const {UserModel,User}=require('./models/user');
