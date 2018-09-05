@@ -222,5 +222,64 @@ describe("patch ",()=>{
                 .send({email:'nfkjdnf',password:'213'})
                 .expect(400)
                 .end(done)
-        })
-    })
+        });
+    });
+
+    describe('Post /users/login',()=>{
+        it("should login user and return auth token",(done)=>{
+            request(app)
+            .post('/users/login')
+            .send({email:users[1].email,password:users[1].password})
+            .expect((res)=>{
+                expect(res.headers['x-auth']).toExist();
+            })
+            .end((err,res)=>{
+                if(err){ return done(err);}
+                User.findById(users[1]._id).then((user)=>{
+                    expect(user.tokens[0]).toInclude({
+                        access:'auth',
+                        token:res.headers['x-auth']
+                    });
+                    done();
+                }).catch((e)=>done(e));
+            });
+        });
+
+        it('should reject invaild login',(done)=>{
+            request(app)
+            .post('/users/login')
+            .send({email:users[1].email,password:"123456789"})
+            .expect(400)
+            .expect((res)=>{
+                expect(res.headers['x-auth']).toNotExist();
+            })
+            .end((err,res)=>{
+                if(err){return done(err);}
+                User.findById(users[1]._id).then((res)=>{
+                    expect(res.tokens.length).toEqual(0);
+                    done();
+                }).catch((err)=>done(err));
+
+            })
+        });
+    });
+
+    describe("Delete /users/me/token",()=>{
+
+        it('should remove auth token',(done)=>{
+            request(app)
+            .delete('/users/me/token')
+            .set('x-auth',users[0].tokens[0].token)
+            .expect(200)
+            .end((err,res)=>{
+                if (err) {
+                    return done(err);
+                }
+
+                User.findById(users[0]._id).then((user)=>{
+                    expect(user.tokens.length).toBe(0);
+                    done();
+                }).catch((err)=>done(err));
+            });
+        });
+    });

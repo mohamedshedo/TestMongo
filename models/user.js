@@ -73,6 +73,15 @@ NewUserSchema.statics.findByToken=function(token){
         'tokens.access':'auth'
     });
 }
+NewUserSchema.methods.removeToken=function(token){
+    let user=this;
+
+  return  user.update({
+        $pull:{
+            tokens:{token}
+        }
+    });
+};
 NewUserSchema.methods.generateAuthToken = function(){
     let user=this;
     let access='auth';
